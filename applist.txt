@@ -1,0 +1,2 @@
+com.HoYoverse.Nap
+com.kurogame.wutheringwaves.global

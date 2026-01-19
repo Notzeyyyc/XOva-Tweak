@@ -1,0 +1,29 @@
+MODDIR=${0%/*}
+#You can use this for determine the code
+[ "$AXERON" == "true" ] || exit 0 #not started in AxManager
+
+cmd notification post -t AxeronService 'Service' "$MODDIR"
+
+prev_target=""
+prev_not=""
+
+while true; do
+    top_pkg=$(dumpsys activity processes \
+        | grep top-activity \
+        | cut -d ':' -f4 \
+        | cut -d '/' -f1 \
+        | head -n 1)
+
+    # Update saat pkg berubah dan tidak kosong
+    if [ -n "$top_pkg" ] && [ "$top_pkg" != "$prev_target" ]; then
+        if grep -q "$top_pkg" "$MODDIR/applist.txt"; then
+            am start -a AxManager.TOAST -e text "$top_pkg detected"
+            prev_target="$top_pkg"
+            continue
+        fi
+        
+        prev_not=""
+    fi
+
+    sleep 3
+done
