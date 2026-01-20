@@ -1,6 +1,3 @@
-# XOvalium Performance Properties
-# Applied persistently via system.prop
-
 # Graphics & Rendering
 debug.hwui.renderer=skiavk
 debug.hwui.target_cpu_percentage=90

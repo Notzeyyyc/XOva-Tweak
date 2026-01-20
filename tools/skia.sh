@@ -1,16 +1,44 @@
 #!/system/bin/sh
-# Force Skia Vulkan for UI Rendering
-# Note: For non-root, some of these might only apply after reboot or to specific apps via AxManager
+# XOvalium SkiaVK Enabler
+# Checks for Vulkan support before applying tweaks
 
-# Set Skia Vulkan as the main rendering pipeline
+echo "Checking Vulkan Support..."
+
+# 1. Check if Vulkan Hardware Feature is present
+if ! pm list features | grep -q "android.hardware.vulkan.level"; then
+    echo "❌ Vulkan Support: MISSING"
+    echo "Aborting SkiaVK tweak to prevent crashes."
+    exit 1
+fi
+
+# 2. Check Vulkan Version (Stability Check)
+# Standard Android 10+ usually has Vulkan 1.1 (4198400) or higher.
+# Vulkan 1.0.3 (4194307) is the bare minimum, but might be buggy for SkiaVK.
+VK_VER_STR=$(pm list features | grep "android.hardware.vulkan.version")
+VK_VER=$(echo "$VK_VER_STR" | cut -d'=' -f2)
+
+if [ -z "$VK_VER" ]; then
+    echo "Vulkan version undefined. Proceeding with caution..."
+else
+    # 4194307 = Vulkan 1.0.3
+    if [ "$VK_VER" -lt 4194307 ]; then
+        echo "❌ Vulkan Version too old ($VK_VER). Needs > 1.0.3"
+        echo "Skipping SkiaVK..."
+        exit 1
+    fi
+    echo "Vulkan Version Safe: $VK_VER"
+fi
+
+echo "Applying Skia Vulkan Renderer..."
+
+# Apply SkiaVK Settings
+# Use both setprop (root/system) and settings put (non-root persistence)
 settings put global debug.hwui.renderer skiavk
-
-# Disable Skia OpenGL (to ensure SkiaVK is used)
 setprop debug.hwui.renderer skiavk
 setprop persist.sys.ui.hw skiavk
 
-# Threading optimizations for Skia
-setprop debug.skia.num_render_threads 4
+# Optimization Props
 setprop debug.skia.threaded_render true
+setprop debug.renderengine.backend skiavk
 
-echo "Skia Vulkan pipeline requested."
+echo "SkiaVK Applied Successfully."

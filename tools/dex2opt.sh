@@ -16,8 +16,6 @@ if ! pm list packages | grep -q "$PKG"; then
 fi
 
 echo "Starting Speed Optimization (DexOpt)..."
-# Using speed-profile for a balance between size and performance
-# Or 'speed' for maximum performance (but larger file size)
 cmd package compile -m speed-profile -f "$PKG"
 
 echo "Optimization Finished for $PKG"

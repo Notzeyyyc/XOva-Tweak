@@ -9,7 +9,7 @@ testing #from /system/bin/testing
 # Triggered from AxManager UI
 
 echo "Applying Global System Boost..."
-sh /data/adb/modules/xovalium/tools/debloat.sh
-sh /data/adb/modules/xovalium/tools/clearcache.sh
+sh /data/data/com.android.shell/AxManager/plugins/xovalium/tools/debloat.sh
+sh /data/data/com.android.shell/AxManager/plugins/xovalium/tools/clearcache.sh
 
 echo "System Optimized!"
